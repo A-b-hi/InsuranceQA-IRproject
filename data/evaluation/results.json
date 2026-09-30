@@ -1,0 +1,271 @@
+{
+  "methods": {
+    "tfidf": {
+      "queries": 2000,
+      "metrics": {
+        "P@10": 0.04715,
+        "P@100": 0.009394999999999999,
+        "Recall@10": 0.3280005952380952,
+        "Recall@100": 0.6042525793650794,
+        "MAP": 0.19431894655631488,
+        "nDCG@10": 0.22695264510582758
+      },
+      "pr_curve": [
+        {
+          "recall": 0.0,
+          "precision": 0.23516879418271214
+        },
+        {
+          "recall": 0.1,
+          "precision": 0.23516879418271214
+        },
+        {
+          "recall": 0.2,
+          "precision": 0.23367074761186848
+        },
+        {
+          "recall": 0.3,
+          "precision": 0.22643818113094222
+        },
+        {
+          "recall": 0.4,
+          "precision": 0.21154847908525187
+        },
+        {
+          "recall": 0.5,
+          "precision": 0.2104435153076436
+        },
+        {
+          "recall": 0.6,
+          "precision": 0.17097264874107207
+        },
+        {
+          "recall": 0.7,
+          "precision": 0.16367670204355222
+        },
+        {
+          "recall": 0.8,
+          "precision": 0.16260629677975624
+        },
+        {
+          "recall": 0.9,
+          "precision": 0.16219748132165568
+        },
+        {
+          "recall": 1.0,
+          "precision": 0.16217190217107655
+        }
+      ],
+      "label": "TF-IDF",
+      "seconds": 5.0
+    },
+    "bm25": {
+      "queries": 2000,
+      "metrics": {
+        "P@10": 0.0598,
+        "P@100": 0.01054,
+        "Recall@10": 0.4066037698412699,
+        "Recall@100": 0.6636323412698413,
+        "MAP": 0.26292701207727237,
+        "nDCG@10": 0.30132901881365
+      },
+      "pr_curve": [
+        {
+          "recall": 0.0,
+          "precision": 0.31584519005032663
+        },
+        {
+          "recall": 0.1,
+          "precision": 0.31584519005032663
+        },
+        {
+          "recall": 0.2,
+          "precision": 0.3131125023702871
+        },
+        {
+          "recall": 0.3,
+          "precision": 0.3032223473712324
+        },
+        {
+          "recall": 0.4,
+          "precision": 0.28398163205999966
+        },
+        {
+          "recall": 0.5,
+          "precision": 0.28171223094900916
+        },
+        {
+          "recall": 0.6,
+          "precision": 0.23528237922741346
+        },
+        {
+          "recall": 0.7,
+          "precision": 0.22471354743365407
+        },
+        {
+          "recall": 0.8,
+          "precision": 0.22197437850462307
+        },
+        {
+          "recall": 0.9,
+          "precision": 0.22139104808991653
+        },
+        {
+          "recall": 1.0,
+          "precision": 0.22139104808991653
+        }
+      ],
+      "label": "BM25",
+      "seconds": 4.4
+    },
+    "semantic": {
+      "queries": 2000,
+      "metrics": {
+        "P@10": 0.08120000000000001,
+        "P@100": 0.012964999999999999,
+        "Recall@10": 0.5393162698412698,
+        "Recall@100": 0.8090406746031745,
+        "MAP": 0.36173331003949905,
+        "nDCG@10": 0.412622275452527
+      },
+      "pr_curve": [
+        {
+          "recall": 0.0,
+          "precision": 0.4326107211739523
+        },
+        {
+          "recall": 0.1,
+          "precision": 0.4326107211739523
+        },
+        {
+          "recall": 0.2,
+          "precision": 0.4302570571490402
+        },
+        {
+          "recall": 0.3,
+          "precision": 0.4164427944009183
+        },
+        {
+          "recall": 0.4,
+          "precision": 0.395894540011184
+        },
+        {
+          "recall": 0.5,
+          "precision": 0.3932325775723271
+        },
+        {
+          "recall": 0.6,
+          "precision": 0.32665512233062843
+        },
+        {
+          "recall": 0.7,
+          "precision": 0.3079700952644894
+        },
+        {
+          "recall": 0.8,
+          "precision": 0.3030467175188741
+        },
+        {
+          "recall": 0.9,
+          "precision": 0.30092975431431396
+        },
+        {
+          "recall": 1.0,
+          "precision": 0.30086539010709257
+        }
+      ],
+      "label": "Semantic",
+      "seconds": 13.9
+    },
+    "hybrid": {
+      "queries": 2000,
+      "metrics": {
+        "P@10": 0.07375,
+        "P@100": 0.01218,
+        "Recall@10": 0.49165277777777777,
+        "Recall@100": 0.7616214285714287,
+        "MAP": 0.3268928713004096,
+        "nDCG@10": 0.3730811967607484
+      },
+      "pr_curve": [
+        {
+          "recall": 0.0,
+          "precision": 0.39166069508687484
+        },
+        {
+          "recall": 0.1,
+          "precision": 0.39166069508687484
+        },
+        {
+          "recall": 0.2,
+          "precision": 0.38864243092350187
+        },
+        {
+          "recall": 0.3,
+          "precision": 0.3781920197415152
+        },
+        {
+          "recall": 0.4,
+          "precision": 0.3555006667541771
+        },
+        {
+          "recall": 0.5,
+          "precision": 0.35287615363378216
+        },
+        {
+          "recall": 0.6,
+          "precision": 0.2936067161916753
+        },
+        {
+          "recall": 0.7,
+          "precision": 0.278223025551437
+        },
+        {
+          "recall": 0.8,
+          "precision": 0.27521262170259425
+        },
+        {
+          "recall": 0.9,
+          "precision": 0.2740922915670074
+        },
+        {
+          "recall": 1.0,
+          "precision": 0.27406451378922964
+        }
+      ],
+      "label": "Hybrid RRF",
+      "seconds": 30.6
+    }
+  },
+  "best": {
+    "P@10": "semantic",
+    "P@100": "semantic",
+    "Recall@10": "semantic",
+    "Recall@100": "semantic",
+    "MAP": "semantic",
+    "nDCG@10": "semantic"
+  },
+  "config": {
+    "split": "test",
+    "queries": 2000,
+    "corpus_size": 27413,
+    "depth": 1000,
+    "ks": [
+      10,
+      100
+    ],
+    "avg_relevant": 1.654,
+    "bm25": {
+      "k1": 1.5,
+      "b": 0.75
+    },
+    "rrf": {
+      "k": 60.0,
+      "depth": 1000
+    },
+    "model": "InsuranceQA_Model (MiniLM-L6, 384-d)",
+    "device": "cpu",
+    "semantic_min_score": 0.3,
+    "generated_utc": "2026-09-29T17:58:38+00:00"
+  }
+}

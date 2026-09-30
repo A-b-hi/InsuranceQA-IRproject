@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% import "_macros.html" as ui with context %}
+{% block title %}{{ query or 'Results' }}{% endblock %}
+{% block body_class %}page-results{{ ' is-wide' if mode == 'compare' }}{% endblock %}
+{% block content %}
+<section class="search-band">
+  <div class="wrap{{ ' wide' if mode == 'compare' }}">{{ ui.search_form(query, method, compare_mode, compact=True) }}</div>
+</section>
+
+<div class="wrap{{ ' wide' if mode == 'compare' }} results-wrap">
+
+{# ---------------- error state ---------------- #}
+{% if error %}
+  <div class="state state-error" role="alert">
+    <svg class="icon state-icon" aria-hidden="true"><use href="#i-alert"/></svg>
+    <h2>{{ 'Search is not ready' if error.kind == 'unavailable' else 'That search could not run' }}</h2>
+    <p>{{ error.message }}</p>
+    {% if error.kind == 'unavailable' %}
+    <p class="hint">Prepare the missing resources, then reload this page:</p>
+    <pre class="cmd">python scripts/prepare_data.py
+python scripts/build_indexes.py
+python scripts/build_embeddings.py</pre>
+    {% else %}
+    <p class="hint">Choose one of the ranking methods above and search again.</p>
+    {% endif %}
+  </div>
+
+{# ---------------- compare mode ---------------- #}
+{% elif mode == 'compare' %}
+  {% set overlap = {} %}
+  {% for m, rs in compare.items() %}{% for r in rs %}
+    {% if overlap.update({r.document_id: (overlap.get(r.document_id, []) + [method_info[m].label])}) %}{% endif %}
+  {% endfor %}{% endfor %}
+  <div class="summary">
+    <h1>Comparing methods for <q>{{ query }}</q></h1>
+    <p>Top {{ k }} answers from each method in {{ '%.0f' | format(took_ms) }} ms. Hover an answer to find it in the other lists.
+      {% if official_shown %}<span class="official inline"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Official answer</span> marks answers the dataset labels as correct for this question.{% endif %}</p>
+  </div>
+  <div class="compare-grid" id="results-area">
+    {% for m, rs in compare.items() %}
+    <section class="compare-col m-{{ m }}" aria-label="{{ method_info[m].label }} results">
+      <header class="compare-head">
+        <h2><span class="dot"></span>{{ method_info[m].label }}</h2>
+        <span>{{ method_info[m].tagline }}</span>
+      </header>
+      {% if rs %}
+        {% set top = rs[0].score %}
+        {% for r in rs %}{{ ui.answer_card(r, official_ids, top, overlap.get(r.document_id), compact=True) }}{% endfor %}
+      {% else %}
+        <div class="col-empty">No answer shares a word with this question. Try Semantic search.</div>
+      {% endif %}
+    </section>
+    {% endfor %}
+  </div>
+
+{# ---------------- single method ---------------- #}
+{% else %}
+  <div class="results-layout">
+    <div class="results-main">
+      <div class="summary">
+        <h1>{{ method_info[method].label }} results for <q>{{ query }}</q></h1>
+        <p>{{ results|length }} answer{{ '' if results|length == 1 else 's' }} in {{ '%.0f' | format(took_ms) }} ms.
+          {% if official_shown %}<span class="official inline"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Official answer</span> marks answers the dataset labels as correct for this question.{% endif %}</p>
+      </div>
+
+      <div id="results-area">
+      {% if results %}
+        {% set top = results[0].score %}
+        <ol class="result-list">
+          {% for r in results %}<li>{{ ui.answer_card(r, official_ids, top) }}</li>{% endfor %}
+        </ol>
+      {% else %}
+        <div class="state state-empty">
+          <svg class="icon state-icon" aria-hidden="true"><use href="#i-search"/></svg>
+          <h2>No matching answers</h2>
+          <p>None of the answers share a keyword with <q>{{ query }}</q> after stop words are removed.</p>
+          <p class="hint">Describe the situation in different words, or try Semantic search, which matches meaning instead of exact words.</p>
+          {% if availability.get('semantic', {}).get('available') and method != 'semantic' %}
+          <a class="btn-secondary" href="{{ url_for('search', q=query, method='semantic') }}">Search with Semantic</a>
+          {% endif %}
+        </div>
+      {% endif %}
+      </div>
+    </div>
+
+    <aside class="aside" aria-label="About this ranking">
+      <div class="aside-card m-{{ method }}">
+        <h2><span class="dot"></span>{{ method_info[method].label }}</h2>
+        <p>{{ method_info[method].description }}</p>
+        <p class="params">{{ params }}</p>
+      </div>
+      <a class="btn-secondary block" href="{{ url_for('search', q=query, compare=1) }}"><svg class="icon" aria-hidden="true"><use href="#i-columns"/></svg>Compare all methods</a>
+      {% if stats %}<p class="aside-note">Searched {{ '{:,}'.format(stats.answers) }} answers.</p>{% endif %}
+    </aside>
+  </div>
+{% endif %}
+
+  <div class="skeletons" aria-hidden="true">
+    {% for _ in range(3) %}<div class="card skeleton"><i class="sk sk-s"></i><i class="sk sk-t"></i><i class="sk"></i><i class="sk"></i><i class="sk sk-m"></i></div>{% endfor %}
+  </div>
+</div>
+{% endblock %}

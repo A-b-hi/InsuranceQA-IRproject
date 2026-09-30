@@ -1,0 +1,9 @@
+{
+  "model_dir": "InsuranceQA_Model",
+  "documents": 27413,
+  "dimension": 384,
+  "device": "cpu",
+  "max_seq_length": 256,
+  "normalized": true,
+  "doc_ids_sha256": "2d63f19f66e74ecf3b9119bdcdd0de849dd5a50b2c267d2470fee59f10e99889"
+}

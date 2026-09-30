@@ -1,0 +1,75 @@
+{# ---------- search form with method selector ---------- #}
+{% macro search_form(query, method, compare_mode, examples=[], compact=False, form_error=None) %}
+<form class="search-form{{ ' compact' if compact }}" action="{{ url_for('search') }}" method="get" role="search" data-loading>
+  <div class="search-box{{ ' has-error' if form_error }}">
+    <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+    <label class="sr-only" for="q">Insurance question</label>
+    <input id="q" type="search" name="q" value="{{ query }}" maxlength="500" autocomplete="off"
+           placeholder="Ask an insurance question" {{ 'autofocus' if not compact and not form_error }}
+           aria-describedby="{{ 'q-error' if form_error }}" aria-invalid="{{ 'true' if form_error else 'false' }}">
+    <button class="btn-primary" type="submit"><span class="btn-label">Search answers</span><span class="spinner" aria-hidden="true"></span></button>
+  </div>
+  {% if form_error %}<p class="field-error" id="q-error" role="alert"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>{{ form_error }}</p>{% endif %}
+
+  <fieldset class="methods">
+    <legend class="sr-only">Ranking method</legend>
+    {% for m in methods %}
+    {% set info = method_info[m] %}{% set ok = availability.get(m, {}).get('available', True) %}
+    <label class="method m-{{ m }}{{ ' is-off' if not ok }}" {% if not ok %}title="{{ availability[m].reason }}"{% endif %}>
+      <input type="radio" name="method" value="{{ m }}" {{ 'checked' if m == method }} {{ 'disabled' if not ok }}>
+      <span class="method-body">
+        <span class="method-top"><span class="dot"></span><span class="method-name">{{ info.label }}</span></span>
+        <span class="method-tag">{{ 'Unavailable' if not ok else info.tagline }}</span>
+      </span>
+    </label>
+    {% endfor %}
+  </fieldset>
+
+  <label class="switch">
+    <input type="checkbox" name="compare" value="1" {{ 'checked' if compare_mode }}>
+    <span class="track" aria-hidden="true"></span>
+    <span>Compare all methods side by side</span>
+  </label>
+
+  {% if examples %}
+  <div class="examples">
+    <p class="examples-title">Real questions from the dataset</p>
+    <ul>
+      {% for ex in examples %}<li><button type="button" class="chip" data-example="{{ ex.question }}">{{ ex.question }}</button></li>{% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+</form>
+{% endmacro %}
+
+{# ---------- one ranked answer ---------- #}
+{% macro answer_card(r, official_ids, top_score, overlap=None, compact=False) %}
+{% set official = r.document_id in official_ids %}
+<article class="card answer{{ ' compact' if compact }}{{ ' is-top' if r.rank == 1 }}" data-doc="{{ r.document_id }}">
+  <div class="answer-head">
+    <span class="rank-pill" aria-label="Rank {{ r.rank }}">{{ r.rank }}</span>
+    {% if r.domain %}<span class="domain">{{ r.domain | domain_label }}</span>{% endif %}
+    {% if official %}<span class="official" title="This answer is labelled as correct for this question in InsuranceQA"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Official answer</span>{% endif %}
+    {% if overlap and overlap|length > 1 %}<span class="overlap" title="Ranked by: {{ overlap | join(', ') }}">In {{ overlap|length }} lists</span>{% endif %}
+    <span class="score" title="{{ method_info[r.method].label }} score">
+      <span class="score-bar" style="--w: {{ (100 * r.score / top_score) if top_score else 0 }}%"></span>
+      <span class="score-num">{{ r.score | score_fmt(r.method) }}</span>
+    </span>
+  </div>
+  {% if r.question %}<h3 class="q">{{ r.question }}</h3>{% endif %}
+  <p class="answer-text" data-clamp>{{ r.answer }}</p>
+  <button type="button" class="more" data-more hidden aria-expanded="false"><span>Show full answer</span><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></button>
+  {% if r.components and not compact %}
+  <div class="provenance" aria-label="Rank in each contributing list">
+    <span class="prov-title">Rank in each list</span>
+    {% for m in ['tfidf','bm25','semantic'] %}
+      <span class="prov m-{{ m }}{{ ' absent' if not r.components.get(m) }}"><span class="dot"></span>{{ method_info[m].label }} <b>{{ ('#' ~ r.components[m]) if r.components.get(m) else 'not in top 1000' }}</b></span>
+    {% endfor %}
+  </div>
+  {% endif %}
+  <div class="answer-foot">
+    <span class="docid">Answer {{ r.document_id }}</span>
+    <button type="button" class="copy" data-copy><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg><span>Copy answer</span></button>
+  </div>
+</article>
+{% endmacro %}

@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Evaluation{% endblock %}
+{% block body_class %}page-eval{% endblock %}
+{% set order = ['tfidf','bm25','semantic','hybrid'] %}
+{% block content %}
+<section class="eval-hero">
+  <div class="wrap">
+    <h1>How well does each method find the right answer?</h1>
+    {% if evaluation %}
+    {% set c = evaluation.config %}
+    <p class="lead">Measured on the {{ c.queries | int }} real questions of the InsuranceQA {{ c.split }} split. Every method ranks all {{ '{:,}'.format(c.corpus_size) }} answers, and the dataset's official answer labels decide what counts as correct.</p>
+    {% else %}
+    <p class="lead">Precision, recall, MAP and nDCG for TF-IDF, BM25, Semantic and Hybrid RRF.</p>
+    {% endif %}
+  </div>
+</section>
+
+<div class="wrap eval-wrap">
+{% if not evaluation %}
+  <div class="state state-empty">
+    <svg class="icon state-icon" aria-hidden="true"><use href="#i-alert"/></svg>
+    <h2>No evaluation results yet</h2>
+    <p>Results are computed from the real InsuranceQA test questions and saved to <code>data/evaluation/results.json</code>.</p>
+    <p class="hint">Run the evaluation, then reload this page:</p>
+    <pre class="cmd">python scripts/evaluate.py</pre>
+  </div>
+{% else %}
+  {% set M = evaluation.methods %}
+  {% set headline = [('P@10','Precision@10','Share of the top 10 answers that are correct'),
+                     ('Recall@100','Recall@100','Share of correct answers found in the top 100'),
+                     ('MAP','MAP','Mean average precision over each method's top 1000'),
+                     ('nDCG@10','nDCG@10','Rewards correct answers placed near the top')] %}
+  <section class="metric-grid" aria-label="Headline metrics">
+    {% for key, title, hint in headline %}
+    {% set best = evaluation.best[key] %}{% set top = M[best].metrics[key] %}
+    <div class="card metric">
+      <h2>{{ title }}</h2>
+      <p class="hint">{{ hint }}. Bars are scaled to the best method.</p>
+      <ul class="bars">
+        {% for m in order %}{% set v = M[m].metrics[key] %}
+        <li class="m-{{ m }}{{ ' best' if m == best }}">
+          <span class="bar-label"><span class="dot"></span>{{ M[m].label }}</span>
+          <span class="bar-track"><span class="bar-fill" style="--w: {{ 100 * v / top if top else 0 }}%"></span></span>
+          <span class="bar-value">{{ '%.3f' | format(v) }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </section>
+
+  <section class="card panel">
+    <h2>Comparison table</h2>
+    <div class="table-scroll">
+      <table class="cmp">
+        <thead><tr><th scope="col">Method</th>{% for k in metric_order %}<th scope="col">{{ k }}</th>{% endfor %}</tr></thead>
+        <tbody>
+          {% for m in order %}
+          <tr class="m-{{ m }}">
+            <th scope="row"><span class="dot"></span>{{ M[m].label }}</th>
+            {% for k in metric_order %}<td class="{{ 'best' if evaluation.best[k] == m }}">{{ '%.4f' | format(M[m].metrics[k]) }}</td>{% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="fine">The best value in each column is highlighted.</p>
+  </section>
+
+  <section class="card panel">
+    <div class="panel-head">
+      <div>
+        <h2>Precision-Recall curve</h2>
+        <p class="fine">11-point interpolated precision, averaged over {{ evaluation.config.queries | int }} questions.</p>
+      </div>
+      {% if has_png %}<a class="btn-secondary" href="{{ url_for('pr_curve_png') }}" download><svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>Download PNG</a>{% endif %}
+    </div>
+    <div class="legend" id="pr-legend"></div>
+    <div class="chart" id="pr-chart"></div>
+  </section>
+
+  <section class="card panel notes">
+    <h2>How these numbers are measured</h2>
+    <dl>
+      <dt>Ranking depth</dt><dd>Each method returns its top {{ evaluation.config.depth }} answers. Correct answers outside that list count as misses.</dd>
+      <dt>Correct answers</dt><dd>A question can have several official answers ({{ evaluation.config.avg_relevant | round(2) }} on average in this split).</dd>
+      <dt>Why P@10 looks low</dt><dd>With {{ evaluation.config.avg_relevant | round(2) }} correct answers per question, P@10 cannot exceed about {{ '%.2f' | format(evaluation.config.avg_relevant / 10) }}. Compare methods with each other, and use recall, MAP and nDCG for the fuller picture.</dd>
+      <dt>Hybrid RRF</dt><dd>Fuses the three top-{{ evaluation.config.rrf.depth }} lists with k = {{ '%g' | format(evaluation.config.rrf.k) }}.</dd>
+      <dt>Settings</dt><dd>BM25 k1 = {{ '%g' | format(evaluation.config.bm25.k1) }}, b = {{ '%g' | format(evaluation.config.bm25.b) }}. Semantic model: {{ evaluation.config.model }} on {{ evaluation.config.device }}.</dd>
+    </dl>
+  </section>
+  <script type="application/json" id="eval-data">{{ evaluation | tojson }}</script>
+{% endif %}
+</div>
+{% endblock %}
+{% block scripts %}{% if evaluation %}<script src="{{ url_for('static', filename='js/evaluation.js') }}" defer></script>{% endif %}{% endblock %}

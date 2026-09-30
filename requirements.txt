@@ -1,0 +1,8 @@
+Flask>=3.0
+numpy>=1.26
+scipy>=1.11
+matplotlib>=3.8
+nltk>=3.8
+torch>=2.2
+sentence-transformers>=3.0
+pytest>=8.0

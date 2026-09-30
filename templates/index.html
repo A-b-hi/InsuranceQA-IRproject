@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% import "_macros.html" as ui with context %}
+{% block body_class %}page-home{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <h1>Find the expert answer to your insurance question</h1>
+      <p class="lead">
+        {% if stats %}Search {{ '{:,}'.format(stats.answers) }} answers written by insurance professionals, across {{ stats.domains }} topics from life and auto to Medicare and annuities.{% else %}Search answers written by insurance professionals.{% endif %}
+        Pick a ranking method, or compare all four on the same question.
+      </p>
+      {% if engine_error %}
+        <div class="notice notice-error" role="alert">
+          <svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>
+          <div><strong>Search is not ready.</strong><span>{{ engine_error }}</span></div>
+        </div>
+      {% endif %}
+      {{ ui.search_form(query, method, compare_mode, examples, form_error=form_error) }}
+    </div>
+    <div class="hero-art" aria-hidden="false">{% include "_fusion_art.html" %}</div>
+  </div>
+</section>
+
+<section class="explain">
+  <div class="wrap">
+    <h2>Four ways to rank the same answers</h2>
+    <div class="explain-grid">
+      {% for m in ['tfidf','bm25','semantic','hybrid'] %}
+      <div class="explain-item m-{{ m }}">
+        <h3><span class="dot"></span>{{ method_info[m].label }}</h3>
+        <p>{{ method_info[m].description }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

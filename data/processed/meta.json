@@ -1,0 +1,43 @@
+{
+  "created_utc": "2026-09-29T08:46:09+00:00",
+  "source": "InsuranceQA V2 (github.com/shuzi/insuranceQA), raw text decoded with the official vocabulary",
+  "validation": {
+    "answers": 27413,
+    "questions": {
+      "train": 12889,
+      "valid": 2000,
+      "test": 2000
+    },
+    "gold_links": 27987,
+    "unknown_tokens": 0,
+    "cross_checked_with_combined_file": true,
+    "answers_linked_to_a_question": 27413
+  },
+  "preprocessing": "clean -> lowercase -> alphanumeric tokens -> NLTK stop words -> Porter stemmer",
+  "source_files": {
+    "InsuranceQA.label2answer.raw.encoded.gz": {
+      "file": "InsuranceQA.label2answer.raw.encoded.gz",
+      "sha256": "25f63201c51e3e2e5c73ca30da114bf8c77c8f40194550148e469a430cceabd2"
+    },
+    "vocabulary": {
+      "file": "vocabulary",
+      "sha256": "087ad8bd0254b57711082856b24d3526178b407d6f849798af1e34f599b2557d"
+    },
+    "InsuranceQA.question.anslabel.raw.encoded.gz": {
+      "file": "InsuranceQA.question.anslabel.raw.encoded.gz",
+      "sha256": "4d10bf9758f841a77b04558faec470846d450f2583c8a4657c3eacf63ee448b5"
+    },
+    "InsuranceQA.question.anslabel.raw.100.pool.solr.train.encoded.gz": {
+      "file": "InsuranceQA.question.anslabel.raw.100.pool.solr.train.encoded.gz",
+      "sha256": "7da9e607180ad5c47cb4069c7480cb4eb198ef88f59a2be62383a67ccb2a6981"
+    },
+    "InsuranceQA.question.anslabel.raw.100.pool.solr.valid.encoded.gz": {
+      "file": "InsuranceQA.question.anslabel.raw.100.pool.solr.valid.encoded.gz",
+      "sha256": "4d594fb3aec673ab61156bacc3adbea8e189215620acd284638b0d0ce0ad55e7"
+    },
+    "InsuranceQA.question.anslabel.raw.100.pool.solr.test.encoded.gz": {
+      "file": "InsuranceQA.question.anslabel.raw.100.pool.solr.test.encoded.gz",
+      "sha256": "7485b38ed538bf9ce9f416efdaa9b13a699ac428dc1dc23fbcae1e57ce398d90"
+    }
+  }
+}
